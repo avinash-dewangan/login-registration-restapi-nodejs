@@ -1,11 +1,13 @@
 const mongoose = require('mongoose')
 const express = require('express')
 var bodyParser = require('body-parser')
+var morgan = require('morgan')
 // Import the library aLLOW CROS Policy orign:
 var cors = require('cors');
 const app = express()
 // Then use it before your routes are set up:
 app.use(cors());
+
 
 // app.use(function (req, res, next) {
 
@@ -31,6 +33,20 @@ app.use(express.urlencoded({ extended: false }));
 require('dotenv').config();
 
 
+app.use(morgan('dev'))
+
+
+app.use(morgan(function (tokens, req, res) {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms'
+    ].join(' ')
+}))
+
+
 
 //Database Setup
 // const db = 'mongodb+srv://avinash:avinash@cluster0.osssk.mongodb.net/test?retryWrites=true&w=majority';
@@ -54,6 +70,13 @@ app.use('/api', PassCatAPI);
 var UserAPI = require('./api/user');
 app.use('/userapi', UserAPI);
 
+app.get('/avinash', (req, res) => {
+    res.status(200).json({
+        message: 'avinash'
+    })
+})
+
+
 //Production Setup
 if (process.env.NODE_ENV == 'production') {
     //Set static folder
@@ -69,3 +92,5 @@ app.use(express.static(__dirname + '/public'));
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log("server started port : " + port));
+
+
